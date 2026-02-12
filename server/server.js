@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
@@ -118,11 +119,23 @@ app.use((req, res, next) => {
 // ==========================================
 // STATIC FILES (production)
 // ==========================================
-app.use(express.static(path.join(__dirname, '../dist'), {
-    dotfiles: 'deny',       // Block .env, .git, etc
+// Use process.cwd() for reliability on Azure iisnode (where __dirname may differ)
+const distPath = path.join(process.cwd(), 'dist');
+const distPathAlt = path.join(__dirname, '../dist');
+const resolvedDistPath = fs.existsSync(distPath) ? distPath : distPathAlt;
+console.log(`[STATIC] Serving from: ${resolvedDistPath} (exists: ${fs.existsSync(resolvedDistPath)})`);
+
+app.use(express.static(resolvedDistPath, {
+    dotfiles: 'deny',
     etag: true,
-    maxAge: '1d',
-    index: false             // Don't serve index.html for directory requests
+    maxAge: 0,              // No cache during debugging
+    index: false,
+    setHeaders: (res, filePath) => {
+        // Ensure correct MIME types
+        if (filePath.endsWith('.js')) res.setHeader('Content-Type', 'text/javascript; charset=utf-8');
+        if (filePath.endsWith('.css')) res.setHeader('Content-Type', 'text/css; charset=utf-8');
+        res.setHeader('Cache-Control', 'no-store');  // Disable cache during debugging
+    }
 }));
 
 // ==========================================
@@ -132,6 +145,23 @@ app.use('/api/news', newsRouter);
 app.use('/api/threats', threatsRouter);
 app.use('/api/reports', reportsRouter);
 app.use('/api/sources', sourcesRouter);
+
+// Debug endpoint - shows file paths on Azure (remove after debugging)
+app.get('/api/debug/paths', (req, res) => {
+    const distFiles = fs.existsSync(resolvedDistPath) ? fs.readdirSync(resolvedDistPath) : [];
+    const assetsPath = path.join(resolvedDistPath, 'assets');
+    const assetFiles = fs.existsSync(assetsPath) ? fs.readdirSync(assetsPath) : [];
+    res.json({
+        cwd: process.cwd(),
+        __dirname,
+        distPath: resolvedDistPath,
+        distExists: fs.existsSync(resolvedDistPath),
+        distFiles,
+        assetFiles,
+        nodeVersion: process.version,
+        env: process.env.NODE_ENV || 'not set'
+    });
+});
 
 // Manual Email Trigger (with strict rate limit + input validation)
 app.post('/api/notifications/send', strictLimiter, async (req, res) => {
