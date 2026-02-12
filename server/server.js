@@ -158,19 +158,41 @@ app.use('/api/reports', reportsRouter);
 app.use('/api/sources', sourcesRouter);
 
 // Debug endpoint - shows file paths on Azure (remove after debugging)
+// Debug endpoint - Deep scan of file system on Azure
 app.get('/api/debug/paths', (req, res) => {
-    const distFiles = fs.existsSync(resolvedDistPath) ? fs.readdirSync(resolvedDistPath) : [];
-    const assetsPath = path.join(resolvedDistPath, 'assets');
-    const assetFiles = fs.existsSync(assetsPath) ? fs.readdirSync(assetsPath) : [];
+    const listDir = (dir) => {
+        try {
+            return fs.readdirSync(dir).map(f => {
+                const fullPath = path.join(dir, f);
+                const stat = fs.statSync(fullPath);
+                return {
+                    name: f,
+                    isDir: stat.isDirectory(),
+                    size: stat.size,
+                    children: stat.isDirectory() && f !== 'node_modules' && f !== '.git' ? listDir(fullPath) : undefined
+                };
+            });
+        } catch (e) {
+            return { error: e.message };
+        }
+    };
+
     res.json({
         cwd: process.cwd(),
         __dirname,
-        distPath: resolvedDistPath,
-        distExists: fs.existsSync(resolvedDistPath),
-        distFiles,
-        assetFiles,
-        nodeVersion: process.version,
-        env: process.env.NODE_ENV || 'not set'
+        __filename,
+        env: process.env,
+        distPathFromDirname,
+        distPathFromCwd,
+        resolvedDistPath,
+        fsTree: {
+            dirname: listDir(__dirname),
+            cwd: listDir(process.cwd()),
+            // Try to find dist in common locations
+            distInCwd: listDir(path.join(process.cwd(), 'dist')),
+            distInRoot: listDir(path.join(process.cwd(), '..', 'dist')),
+            wwwroot: listDir('C:\\home\\site\\wwwroot')
+        }
     });
 });
 
