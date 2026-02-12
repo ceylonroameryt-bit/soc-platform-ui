@@ -60,12 +60,13 @@ app.use((req, res, next) => {
 const allowedOrigins = [
     'http://localhost:5173',   // Vite dev server
     'http://localhost:3000',   // Server itself
-    process.env.ALLOWED_ORIGIN // Production domain from .env
+    process.env.ALLOWED_ORIGIN, // Production domain from .env
+    process.env.WEBSITE_HOSTNAME ? `https://${process.env.WEBSITE_HOSTNAME}` : null // Azure specific hostname
 ].filter(Boolean);
 
 app.use(cors({
     origin: (origin, callback) => {
-        // Allow requests with no origin (server-to-server, curl, mobile apps)
+        // Allow requests with no origin (server-to-server, curl, mobile apps, standard browser navigation)
         if (!origin) return callback(null, true);
         if (allowedOrigins.includes(origin)) {
             callback(null, true);
@@ -74,11 +75,20 @@ app.use(cors({
             callback(new Error('Not allowed by CORS'));
         }
     },
-    methods: ['GET', 'POST'],
+    methods: ['GET', 'POST', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
     maxAge: 86400 // Cache preflight for 24 hours
 }));
+
+// ... (skipping unchanged code) ...
+
+// ==========================================
+// CATCH-ALL FOR REACT SPA (must be last)
+// ==========================================
+app.get('*', (req, res) => {
+    res.sendFile(path.join(resolvedDistPath, 'index.html'));
+});
 
 // 5. Body Parser with Size Limit (prevent payload bombs)
 app.use(express.json({ limit: '10kb' }));
@@ -226,8 +236,8 @@ app.post('/api/notifications/send', strictLimiter, async (req, res) => {
 // ==========================================
 // CATCH-ALL FOR REACT SPA (must be last)
 // ==========================================
-app.get('/{*path}', (req, res) => {
-    res.sendFile(path.join(__dirname, '../dist/index.html'));
+app.get('*', (req, res) => {
+    res.sendFile(path.join(resolvedDistPath, 'index.html'));
 });
 
 // ==========================================
