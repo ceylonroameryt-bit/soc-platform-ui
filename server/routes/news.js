@@ -3,12 +3,9 @@ import { fetchAndProcessNews, getNews, getSeverityStats } from '../services/news
 
 const router = express.Router();
 
-// Fetch fresh news (triggers update)
-router.get('/', async (req, res) => {
-    // In a real app, fetching might be a background job. 
-    // Here we trigger it on request BUT return cached data effectively if recently updated, 
-    // or just wait for the fetch. For simplicity, we wait.
-    const news = await fetchAndProcessNews();
+// Serve news from in-memory cache (instant response)
+router.get('/', (req, res) => {
+    const news = getNews();
     res.json(news.slice(0, 50)); // Return top 50
 });
 

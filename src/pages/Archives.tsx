@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Database, FileText, Search, ShieldAlert, Globe } from 'lucide-react';
+import { API_BASE } from '../config/api';
 
 interface ThreatItem {
     id: string;
@@ -30,8 +31,8 @@ const Archives = () => {
             setLoading(true);
             try {
                 const [threatsRes, newsRes] = await Promise.all([
-                    fetch('http://localhost:3000/api/threats'),
-                    fetch('http://localhost:3000/api/news')
+                    fetch(`${API_BASE}/api/threats`),
+                    fetch(`${API_BASE}/api/news`)
                 ]);
                 const threatsData = await threatsRes.json();
                 const newsData = await newsRes.json();

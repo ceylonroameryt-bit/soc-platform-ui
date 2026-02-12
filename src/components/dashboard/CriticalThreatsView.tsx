@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ShieldAlert, AlertTriangle, Activity, Zap, ExternalLink } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { API_BASE } from '../../config/api';
 
 interface NewsItem {
     title: string;
@@ -32,8 +33,8 @@ const CriticalThreatsView = () => {
         const fetchData = async () => {
             try {
                 const [newsRes, statsRes] = await Promise.all([
-                    fetch('http://localhost:3000/api/news'),
-                    fetch('http://localhost:3000/api/news/stats')
+                    fetch(`${API_BASE}/api/news`),
+                    fetch(`${API_BASE}/api/news/stats`)
                 ]);
                 const newsData = await newsRes.json();
                 const statsData = await statsRes.json();
@@ -58,7 +59,7 @@ const CriticalThreatsView = () => {
     let threatLevel = "LOW";
     let threatColor = "text-blue-500 border-blue-500/30 bg-blue-500/10";
 
-    if (threatScore > 5) { threadLevel = "ELEVATED"; threatColor = "text-yellow-500 border-yellow-500/30 bg-yellow-500/10"; }
+    if (threatScore > 5) { threatLevel = "ELEVATED"; threatColor = "text-yellow-500 border-yellow-500/30 bg-yellow-500/10"; }
     if (threatScore > 10) { threatLevel = "HIGH"; threatColor = "text-orange-500 border-orange-500/30 bg-orange-500/10"; }
     if (threatScore > 20) { threatLevel = "CRITICAL"; threatColor = "text-red-500 border-red-500/30 bg-red-500/10"; }
 

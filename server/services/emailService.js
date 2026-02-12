@@ -78,10 +78,11 @@ export const sendPeriodicSummary = async (toEmail) => {
         };
 
         const info = await transporter.sendMail(mailOptions);
-        console.log('Email sent: ' + info.response);
+        console.log('[EMAIL] Sent successfully: ' + info.response);
         return { success: true, message: 'Email sent successfully' };
     } catch (error) {
-        console.error('Error sending email:', error);
-        return { success: false, error: error.message };
+        console.error('[EMAIL ERROR]', error.message);
+        // Never leak internal error details to the client
+        return { success: false, error: 'Email delivery failed. Check server logs.' };
     }
 };

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import NewsFeed from './NewsFeed';
+import { API_BASE } from '../../config/api';
 
 interface SeverityStat {
     name: string;
@@ -19,7 +20,7 @@ const SeverityChart = () => {
     const [selectedSeverity, setSelectedSeverity] = useState<string | null>(null);
 
     useEffect(() => {
-        fetch('http://localhost:3000/api/news/stats')
+        fetch(`${API_BASE}/api/news/stats`)
             .then(res => res.json())
             .then(data => setData(data))
             .catch(err => console.error('Error fetching stats:', err));

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ShieldAlert, FileText, Activity, Globe } from 'lucide-react';
+import { API_BASE } from '../../config/api';
 
 interface NewsItem {
     title: string;
@@ -16,7 +17,7 @@ const NewsSummary = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetch('http://localhost:3000/api/news')
+        fetch(`${API_BASE}/api/news`)
             .then(res => res.json())
             .then(data => {
                 setNews(data);

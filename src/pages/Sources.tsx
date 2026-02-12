@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Radio, Shield, Globe, ExternalLink, Activity, Search } from 'lucide-react';
 import axios from 'axios';
+import { API_BASE } from '../config/api';
 
 interface Source {
     name: string;
@@ -20,7 +21,7 @@ const Sources = () => {
     useEffect(() => {
         const fetchSources = async () => {
             try {
-                const response = await axios.get('http://localhost:3000/api/sources');
+                const response = await axios.get(`${API_BASE}/api/sources`);
                 setSources(response.data);
             } catch (error) {
                 console.error('Error fetching sources:', error);

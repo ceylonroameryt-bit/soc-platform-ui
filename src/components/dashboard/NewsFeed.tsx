@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ExternalLink, Flame, Calendar } from 'lucide-react';
+import { API_BASE } from '../../config/api';
 
 interface NewsItem {
     title: string;
@@ -22,7 +23,7 @@ const NewsFeed = ({ mode = 'all', severityFilter }: NewsFeedProps) => {
 
     useEffect(() => {
         const fetchNews = () => {
-            fetch('http://localhost:3000/api/news')
+            fetch(`${API_BASE}/api/news`)
                 .then(res => res.json())
                 .then(data => {
                     setNews(data);

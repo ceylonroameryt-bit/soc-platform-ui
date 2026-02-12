@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ShieldAlert, Globe, Hash } from 'lucide-react';
+import { API_BASE } from '../config/api';
 
 interface Threat {
     id: string;
@@ -24,7 +25,7 @@ const Threats = () => {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        fetch('http://localhost:3000/api/threats')
+        fetch(`${API_BASE}/api/threats`)
             .then(res => {
                 if (!res.ok) throw new Error('Failed to fetch threat intelligence');
                 return res.json();
@@ -91,11 +92,11 @@ const Threats = () => {
                         <div className="text-4xl font-black text-slate-700">{threats.length}</div>
                         <div className="text-sm text-slate-500 uppercase tracking-widest font-bold">Active Threats</div>
                         <div className="flex gap-2 mt-2">
-                            <a href="http://localhost:3000/api/reports/export/threats" target="_blank" rel="noopener noreferrer"
+                            <a href={`${API_BASE}/api/reports/export/threats`} target="_blank" rel="noopener noreferrer"
                                 className="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded border border-slate-700 transition-colors flex items-center gap-2">
                                 <ShieldAlert className="w-3 h-3" /> Export Threats
                             </a>
-                            <a href="http://localhost:3000/api/reports/export/news" target="_blank" rel="noopener noreferrer"
+                            <a href={`${API_BASE}/api/reports/export/news`} target="_blank" rel="noopener noreferrer"
                                 className="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded border border-slate-700 transition-colors flex items-center gap-2">
                                 <Globe className="w-3 h-3" /> Export News
                             </a>

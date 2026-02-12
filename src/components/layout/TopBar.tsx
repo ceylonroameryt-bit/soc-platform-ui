@@ -1,4 +1,5 @@
 import { Search, Download, Mail, Menu } from 'lucide-react';
+import { API_BASE } from '../../config/api';
 
 interface TopBarProps {
     onMenuClick?: () => void;
@@ -34,7 +35,7 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
             <div className="flex items-center space-x-2 lg:space-x-4">
                 <button
                     onClick={() => {
-                        fetch('http://localhost:3000/api/notifications/send', {
+                        fetch(`${API_BASE}/api/notifications/send`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ email: 'poornasujampathi@gmail.com' })
@@ -50,7 +51,7 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
                     <Mail className="w-4 h-4" />
                     <span className="hidden sm:inline">Email Report</span>
                 </button>
-                <a href="http://localhost:3000/api/reports/daily" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-cyan-400 px-3 py-2 lg:px-4 rounded-lg border border-slate-700 hover:border-cyan-500/50 transition-all font-medium text-xs lg:text-sm">
+                <a href={`${API_BASE}/api/reports/daily`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-cyan-400 px-3 py-2 lg:px-4 rounded-lg border border-slate-700 hover:border-cyan-500/50 transition-all font-medium text-xs lg:text-sm">
                     <Download className="w-4 h-4" />
                     <span className="hidden sm:inline">Download Report</span>
                 </a>
