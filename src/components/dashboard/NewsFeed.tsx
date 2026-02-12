@@ -26,7 +26,8 @@ const NewsFeed = ({ mode = 'all', severityFilter }: NewsFeedProps) => {
             fetch(`${API_BASE}/api/news`)
                 .then(res => res.json())
                 .then(data => {
-                    setNews(data);
+                    // API returns { news: [...] }, extract the array
+                    setNews(data.news || []);
                     setLoading(false);
                 })
                 .catch(err => {
