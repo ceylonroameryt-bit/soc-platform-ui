@@ -1,5 +1,89 @@
 [
   {
+    "id": "TRT-2026-3361",
+    "type": "Zero-Day",
+    "severity": "High",
+    "source": "Threat Intel Feed",
+    "description": "Active Zero-Day campaign detected via network sensors. IOCs indicate targeting financial sector.",
+    "ioc": {
+      "md5": "5e884898da28047151d0e56f8dc62927",
+      "ip_addresses": [
+        "192.168.150.207"
+      ],
+      "domains": [
+        "malicious-219.com"
+      ]
+    },
+    "timestamp": "2026-02-12T17:26:34.852Z"
+  },
+  {
+    "id": "TRT-2026-6899",
+    "type": "Dark Web Leak",
+    "severity": "Critical",
+    "source": "Onion Forum Monitor",
+    "description": "Credential dump detected on underground forum matching corporate domain patterns. Verify user accounts immediately.",
+    "ioc": {
+      "md5": "5e884898da28047151d0e56f8dc62927",
+      "ip_addresses": [
+        "192.168.214.82"
+      ],
+      "domains": [
+        "hidden-service.onion"
+      ]
+    },
+    "timestamp": "2026-02-12T17:26:34.852Z"
+  },
+  {
+    "id": "TRT-2026-4804",
+    "type": "Malware",
+    "severity": "High",
+    "source": "Threat Intel Feed",
+    "description": "Active Malware campaign detected via network sensors. IOCs indicate targeting financial sector.",
+    "ioc": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "ip_addresses": [
+        "192.168.88.237"
+      ],
+      "domains": [
+        "malicious-76.com"
+      ]
+    },
+    "timestamp": "2026-02-12T17:26:34.852Z"
+  },
+  {
+    "id": "TRT-2026-9360",
+    "type": "Dark Web Leak",
+    "severity": "Critical",
+    "source": "Onion Forum Monitor",
+    "description": "Credential dump detected on underground forum matching corporate domain patterns. Verify user accounts immediately.",
+    "ioc": {
+      "ip_addresses": [
+        "192.168.62.53"
+      ],
+      "domains": [
+        "hidden-service.onion"
+      ]
+    },
+    "timestamp": "2026-02-12T17:26:34.852Z"
+  },
+  {
+    "id": "TRT-2026-7962",
+    "type": "Botnet",
+    "severity": "Low",
+    "source": "HoneyPot Network",
+    "description": "Active Botnet campaign detected via network sensors. IOCs indicate targeting financial sector.",
+    "ioc": {
+      "md5": "5e884898da28047151d0e56f8dc62927",
+      "ip_addresses": [
+        "192.168.158.12"
+      ],
+      "domains": [
+        "malicious-875.com"
+      ]
+    },
+    "timestamp": "2026-02-12T17:26:34.852Z"
+  },
+  {
     "id": "TRT-2026-896",
     "type": "Phishing",
     "severity": "Critical",
