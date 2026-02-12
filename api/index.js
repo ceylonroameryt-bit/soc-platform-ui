@@ -21,10 +21,10 @@ const SEVERITY_KEYWORDS = {
 
 function determineSeverity(title, snippet = '') {
     const text = `${title} ${snippet}`.toLowerCase();
-    if (SEVERITY_KEYWORDS.critical.some(k => text.includes(k))) return 'critical';
-    if (SEVERITY_KEYWORDS.high.some(k => text.includes(k))) return 'high';
-    if (SEVERITY_KEYWORDS.medium.some(k => text.includes(k))) return 'medium';
-    return 'low';
+    if (SEVERITY_KEYWORDS.critical.some(k => text.includes(k))) return 'Critical';
+    if (SEVERITY_KEYWORDS.high.some(k => text.includes(k))) return 'High';
+    if (SEVERITY_KEYWORDS.medium.some(k => text.includes(k))) return 'Medium';
+    return 'Low';
 }
 
 async function fetchNews() {
@@ -116,6 +116,52 @@ export default async function handler(req, res) {
         }
 
         return res.json({ news });
+    }
+
+    // Sources endpoint - return RSS feed sources
+    if (path === '/api/sources') {
+        const sources = RSS_FEEDS.map((feedUrl, index) => {
+            // Extract domain name from RSS feed URL
+            let name = 'Unknown Source';
+            let category = 'Cybersecurity';
+            let type = 'RSS Feed';
+
+            if (feedUrl.includes('cisa.gov')) {
+                name = 'CISA Cybersecurity Advisories';
+                category = 'Government';
+                type = 'Official Advisories';
+            } else if (feedUrl.includes('us-cert.gov')) {
+                name = 'US-CERT Current Activity';
+                category = 'Government';
+                type = 'Alerts & Updates';
+            } else if (feedUrl.includes('bleepingcomputer')) {
+                name = 'BleepingComputer';
+                category = 'News';
+                type = 'Security News';
+            } else if (feedUrl.includes('thehackersnews')) {
+                name = 'The Hacker\'s News';
+                category = 'News';
+                type = 'Threat Intelligence';
+            } else if (feedUrl.includes('krebsonsecurity')) {
+                name = 'Krebs on Security';
+                category = 'Research';
+                type = 'Security Research';
+            } else if (feedUrl.includes('threatpost')) {
+                name = 'Threatpost';
+                category = 'News';
+                type = 'Breaking Threats';
+            }
+
+            return {
+                name,
+                url: feedUrl.replace('/feed/', '').replace('/feed', ''),
+                type,
+                category,
+                status: 'Active'
+            };
+        });
+
+        return res.json(sources);
     }
 
     // Threats endpoint
