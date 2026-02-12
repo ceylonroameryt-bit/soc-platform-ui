@@ -119,22 +119,33 @@ app.use((req, res, next) => {
 // ==========================================
 // STATIC FILES (production)
 // ==========================================
-// Use process.cwd() for reliability on Azure iisnode (where __dirname may differ)
-const distPath = path.join(process.cwd(), 'dist');
-const distPathAlt = path.join(__dirname, '../dist');
-const resolvedDistPath = fs.existsSync(distPath) ? distPath : distPathAlt;
-console.log(`[STATIC] Serving from: ${resolvedDistPath} (exists: ${fs.existsSync(resolvedDistPath)})`);
+// __dirname-relative path is always correct; cwd() varies on Azure iisnode
+const distPathFromDirname = path.join(__dirname, '../dist');
+const distPathFromCwd = path.join(process.cwd(), 'dist');
+const resolvedDistPath = fs.existsSync(distPathFromDirname) ? distPathFromDirname : distPathFromCwd;
+console.log(`[STATIC] __dirname dist: ${distPathFromDirname} (exists: ${fs.existsSync(distPathFromDirname)})`);
+console.log(`[STATIC] cwd dist: ${distPathFromCwd} (exists: ${fs.existsSync(distPathFromCwd)})`);
+console.log(`[STATIC] Using: ${resolvedDistPath}`);
 
+// Serve static files from dist/
 app.use(express.static(resolvedDistPath, {
     dotfiles: 'deny',
     etag: true,
-    maxAge: 0,              // No cache during debugging
-    index: false,
+    maxAge: isDev ? 0 : '1d',
+    index: 'index.html',
     setHeaders: (res, filePath) => {
-        // Ensure correct MIME types
+        // Ensure correct MIME types for Azure/IIS compatibility
         if (filePath.endsWith('.js')) res.setHeader('Content-Type', 'text/javascript; charset=utf-8');
         if (filePath.endsWith('.css')) res.setHeader('Content-Type', 'text/css; charset=utf-8');
-        res.setHeader('Cache-Control', 'no-store');  // Disable cache during debugging
+        if (filePath.endsWith('.svg')) res.setHeader('Content-Type', 'image/svg+xml');
+        if (filePath.endsWith('.woff2')) res.setHeader('Content-Type', 'font/woff2');
+        if (filePath.endsWith('.woff')) res.setHeader('Content-Type', 'font/woff');
+        // Cache hashed assets for 1 year, others no-cache
+        if (filePath.includes('/assets/') && /\.[a-zA-Z0-9]{8,}\./.test(path.basename(filePath))) {
+            res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+        } else {
+            res.setHeader('Cache-Control', 'no-cache');
+        }
     }
 }));
 
