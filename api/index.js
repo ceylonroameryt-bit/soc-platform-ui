@@ -92,7 +92,29 @@ export default async function handler(req, res) {
 
     // News endpoint - fetch real RSS feeds
     if (path === '/api/news') {
+        // Disable caching for debugging
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+
         const news = await fetchNews();
+
+        // Fallback to mock data if RSS fetch fails
+        if (news.length === 0) {
+            console.log('RSS fetch failed, returning mock data');
+            return res.json({
+                news: [
+                    {
+                        id: 1,
+                        title: '[MOCK] RSS Feeds Unavailable -' + new Date().toISOString(),
+                        source: 'System',
+                        severity: 'medium',
+                        pubDate: new Date().toISOString(),
+                        description: 'Real RSS feeds could not be fetched. This is mock data.',
+                        link: '#'
+                    }
+                ]
+            });
+        }
+
         return res.json({ news });
     }
 
