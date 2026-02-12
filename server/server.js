@@ -33,26 +33,12 @@ const isDev = process.env.NODE_ENV !== 'production';
 // 1. Compression
 app.use(compression());
 
-// 2. Helmet - Security Headers
-const cspConnectSrc = ["'self'", "http://localhost:3000", "http://localhost:5173"];
-if (process.env.ALLOWED_ORIGIN) cspConnectSrc.push(process.env.ALLOWED_ORIGIN);
-
+// 2. Helmet - Security Headers (CSP temporarily disabled for Azure debugging)
 app.use(helmet({
-    contentSecurityPolicy: {
-        directives: {
-            defaultSrc: ["'self'"],
-            scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-            styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-            fontSrc: ["'self'", "https://fonts.gstatic.com"],
-            imgSrc: ["'self'", "data:", "blob:"],
-            connectSrc: cspConnectSrc,
-            frameSrc: ["'none'"],
-            objectSrc: ["'none'"],
-            baseUri: ["'self'"],
-            formAction: ["'self'"],
-        }
-    },
-    crossOriginEmbedderPolicy: false,  // Allow loading cross-origin resources
+    contentSecurityPolicy: false,
+    crossOriginEmbedderPolicy: false,
+    crossOriginOpenerPolicy: false,
+    crossOriginResourcePolicy: false,
     referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
     hsts: { maxAge: 31536000, includeSubDomains: true, preload: true },
     noSniff: true,
