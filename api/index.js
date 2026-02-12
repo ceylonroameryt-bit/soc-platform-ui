@@ -1,66 +1,68 @@
-import 'dotenv/config';
-import express from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
-import rateLimit from 'express-rate-limit';
-import compression from 'compression';
+// Minimal Vercel serverless API handler
+export default async function handler(req, res) {
+    // Enable CORS
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-// Route imports
-import newsRouter from './routes/news.js';
-import threatsRouter from './routes/threats.js';
-import reportsRouter from './routes/reports.js';
-import sourcesRouter from './routes/sources.js';
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
 
-const app = express();
+    const url = new URL(req.url, `http://${req.headers.host}`);
+    const path = url.pathname;
 
-// ==========================================
-// SECURITY MIDDLEWARE
-// ==========================================
+    // Health check
+    if (path === '/api/health') {
+        return res.json({
+            status: 'ok',
+            timestamp: new Date().toISOString(),
+            environment: 'vercel'
+        });
+    }
 
-app.use(compression());
+    // News endpoint
+    if (path === '/api/news') {
+        return res.json({
+            news: [
+                {
+                    id: 1,
+                    title: 'Critical Vulnerability in Apache Log4j',
+                    source: 'CISA',
+                    severity: 'critical',
+                    timestamp: new Date().toISOString(),
+                    description: 'Remote code execution vulnerability affecting multiple versions'
+                },
+                {
+                    id: 2,
+                    title: 'New Ransomware Campaign Targeting Healthcare',
+                    source: 'FBI',
+                    severity: 'high',
+                    timestamp: new Date().toISOString(),
+                    description: 'Sophisticated ransomware targeting medical institutions'
+                },
+                {
+                    id: 3,
+                    title: 'State-Sponsored APT Activity Detected',
+                    source: 'NSA',
+                    severity: 'high',
+                    timestamp: new Date().toISOString(),
+                    description: 'Advanced persistent threat targeting government infrastructure'
+                }
+            ]
+        });
+    }
 
-app.use(helmet({
-    contentSecurityPolicy: false,
-    crossOriginEmbedderPolicy: false,
-}));
+    // Threats endpoint
+    if (path === '/api/threats') {
+        return res.json({
+            threats: [
+                { id: 1, name: 'CVE-2024-1234', severity: 'critical', status: 'active' },
+                { id: 2, name: 'CVE-2024-5678', severity: 'high', status: 'mitigated' }
+            ]
+        });
+    }
 
-app.use(cors({
-    origin: '*', // Allow all origins for Vercel deployment
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true,
-}));
-
-// Rate limiting
-const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100,
-    message: 'Too many requests from this IP, please try again later.',
-});
-app.use('/api/', limiter);
-
-// ==========================================
-// BODY PARSING
-// ==========================================
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// ==========================================
-// API ROUTES
-// ==========================================
-app.use('/api/news', newsRouter);
-app.use('/api/threats', threatsRouter);
-app.use('/api/reports', reportsRouter);
-app.use('/api/sources', sourcesRouter);
-
-// Health check
-app.get('/api/health', (req, res) => {
-    res.json({
-        status: 'ok',
-        timestamp: new Date().toISOString(),
-        environment: process.env.VERCEL ? 'vercel' : 'local'
-    });
-});
-
-// Vercel serverless export
-export default app;
+    // Default 404
+    res.status(404).json({ error: 'Not found', path });
+}
