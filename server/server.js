@@ -68,7 +68,9 @@ app.use(cors({
     origin: (origin, callback) => {
         // Allow requests with no origin (server-to-server, curl, mobile apps, standard browser navigation)
         if (!origin) return callback(null, true);
-        if (allowedOrigins.includes(origin)) {
+        
+        // Dynamically allow Railway domains to prevent production lockouts
+        if (allowedOrigins.includes(origin) || origin.endsWith('.up.railway.app')) {
             callback(null, true);
         } else {
             console.warn(`⚠️  CORS blocked request from: ${origin}`);
