@@ -86,7 +86,7 @@ app.use(cors({
 // ==========================================
 // CATCH-ALL FOR REACT SPA (must be last)
 // ==========================================
-app.get('*', (req, res) => {
+app.get('/(.*)', (req, res) => {
     res.sendFile(path.join(resolvedDistPath, 'index.html'));
 });
 
@@ -233,12 +233,6 @@ app.post('/api/notifications/send', strictLimiter, async (req, res) => {
     }
 });
 
-// ==========================================
-// CATCH-ALL FOR REACT SPA (must be last)
-// ==========================================
-app.get('*', (req, res) => {
-    res.sendFile(path.join(resolvedDistPath, 'index.html'));
-});
 
 // ==========================================
 // GLOBAL ERROR HANDLER (prevents stack trace leaks)
