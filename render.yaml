@@ -1,0 +1,31 @@
+services:
+  # Backend FastAPI Web Service
+  - type: web
+    name: compliance-engine-backend
+    env: python
+    region: frankfurt # You can change this to your preferred region
+    buildCommand: "cd backend && pip install -r requirements.txt"
+    startCommand: "cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.4 # Render's default or match your local version
+      - key: GEMINI_API_KEY
+        sync: false # You will need to add this manually in the Render Dashboard
+      - key: NVD_API_KEY
+        sync: false # Optional, add manually in Render Dashboard if you have one
+      - key: DATABASE_URL
+        value: sqlite:///./ce_engine.db
+
+  # Frontend React Static Site
+  - type: web
+    name: compliance-engine-frontend
+    env: static
+    region: frankfurt # Match the backend region
+    buildCommand: "cd frontend && npm install && npm run build"
+    staticPublishPath: "./frontend/dist"
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: compliance-engine-backend
+          envVarKey: RENDER_EXTERNAL_URL
