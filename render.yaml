@@ -16,7 +16,6 @@ services:
   - type: web
     name: soc-platform-frontend
     env: static
-    plan: free
     buildCommand: "npm install && npm run build"
     staticPublishPath: "./dist"
     envVars:
