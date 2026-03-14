@@ -86,7 +86,7 @@ app.use(cors({
 // ==========================================
 // CATCH-ALL FOR REACT SPA (must be last)
 // ==========================================
-app.get('/(.*)', (req, res) => {
+app.get('/:any*', (req, res) => {
     res.sendFile(path.join(resolvedDistPath, 'index.html'));
 });
 
